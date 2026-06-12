@@ -1,24 +1,20 @@
 from flask import Flask, render_template, request
+import os
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-
     results = []
 
     if request.method == "POST":
-
         study_hours = float(request.form["study_hours"])
 
         subjects = []
 
         for i in range(1, 4):
-
             name = request.form[f"name{i}"]
-
             difficulty = int(request.form[f"difficulty{i}"])
-
             days_left = int(request.form[f"days{i}"])
 
             priority = (difficulty * 2) + (30 - days_left)
@@ -41,19 +37,14 @@ def home():
         )
 
         for subject in subjects:
-
             allocated_hours = (
-                subject["priority"] /
-                total_priority
+                subject["priority"] / total_priority
             ) * study_hours
 
             results.append({
                 "name": subject["name"],
                 "priority": subject["priority"],
-                "hours": round(
-                    allocated_hours,
-                    1
-                )
+                "hours": round(allocated_hours, 1)
             })
 
     return render_template(
@@ -62,4 +53,8 @@ def home():
     )
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(
+        host="0.0.0.0",
+        port=port
+    )
